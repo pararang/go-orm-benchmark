@@ -23,11 +23,11 @@ All packages are the latest versions & run in no-cache mode.
 ```sh
 # start database
 docker run -d --rm \
-		--name test-pg \
-		-e POSTGRES_DB=test \
-    -e POSTGRES_USER=postgres \
-    -e POSTGRES_PASSWORD=postgres \
-		-p 5432:5432 \
+  --name test-pg \
+  -e POSTGRES_DB=test \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
     postgres:12-alpine
 
 # all
