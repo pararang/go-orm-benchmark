@@ -2,9 +2,10 @@ package benchs
 
 import (
 	"fmt"
+	"strconv"
 
-	_ "github.com/lib/pq"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 var sqlxdb *sqlx.DB
@@ -18,7 +19,7 @@ func init() {
 		st.AddBenchmark("Read", 4000*ORM_MULTI, SqlxRead)
 		st.AddBenchmark("MultiRead limit 100", 2000*ORM_MULTI, SqlxReadSlice)
 
-		db, err := sqlx.Connect("postgres", ORM_SOURCE);
+		db, err := sqlx.Connect("postgres", ORM_SOURCE)
 		checkErr(err)
 		sqlxdb = db
 	}
@@ -30,17 +31,85 @@ func SqlxInsert(b *B) {
 		initDB()
 		m = NewModel()
 	})
+
 	for i := 0; i < b.N; i++ {
-		sqlxdb.MustExec(`INSERT INTO model (name, title, fax, web, age, "right", counter) VALUES ($1, $2, $3, $4, $5, $6, $7)`, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		_, err := sqlxdb.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
 	}
 }
 
 func SqlxInsertMulti(b *B) {
-	panic(fmt.Errorf("in preparation"))
+	var ms []*Model
+	wrapExecute(b, func() {
+		initDB()
+
+		ms = make([]*Model, 0, 100)
+		for i := 0; i < 100; i++ {
+			ms = append(ms, NewModel())
+		}
+	})
+
+	var valuesSQL string
+	counter := 1
+	for i := 0; i < 100; i++ {
+		hoge := ""
+		for j := 0; j < 7; j++ {
+			if j != 6 {
+				hoge += "$" + strconv.Itoa(counter) + ","
+			} else {
+				hoge += "$" + strconv.Itoa(counter)
+			}
+			counter++
+
+		}
+		if i != 99 {
+			valuesSQL += "(" + hoge + "),"
+		} else {
+			valuesSQL += "(" + hoge + ")"
+		}
+	}
+
+	for i := 0; i < b.N; i++ {
+		nFields := 7
+		query := rawInsertBaseSQL + valuesSQL
+		args := make([]interface{}, len(ms)*nFields)
+		for j := range ms {
+			offset := j * nFields
+			args[offset+0] = ms[j].Name
+			args[offset+1] = ms[j].Title
+			args[offset+2] = ms[j].Fax
+			args[offset+3] = ms[j].Web
+			args[offset+4] = ms[j].Age
+			args[offset+5] = ms[j].Right
+			args[offset+6] = ms[j].Counter
+		}
+		// pq does not support the LastInsertId method.
+		_, err := sqlxdb.Exec(query, args...)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
+	}
 }
 
 func SqlxUpdate(b *B) {
-	panic(fmt.Errorf("in preparation"))
+	var m *Model
+	wrapExecute(b, func() {
+		initDB()
+		m = NewModel()
+		sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+	})
+
+	for i := 0; i < b.N; i++ {
+		_, err := sqlxdb.Exec(rawUpdateSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter, m.ID)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
+	}
 }
 
 func SqlxRead(b *B) {
@@ -48,11 +117,12 @@ func SqlxRead(b *B) {
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
-		sqlxdb.MustExec(`INSERT INTO model (name, title, fax, web, age, "right", counter) VALUES ($1, $2, $3, $4, $5, $6, $7)`, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 	})
+
 	for i := 0; i < b.N; i++ {
-		m := []Model{}
-		if err := sqlxdb.Select(&m, "SELECT * FROM model"); err != nil {
+		m := Model{}
+		if err := sqlxdb.Get(&m, "SELECT * FROM models LIMIT 1"); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -60,5 +130,20 @@ func SqlxRead(b *B) {
 }
 
 func SqlxReadSlice(b *B) {
-	panic(fmt.Errorf("in preparation"))
+	var m *Model
+	wrapExecute(b, func() {
+		initDB()
+		m = NewModel()
+		for i := 0; i < 100; i++ {
+			sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		}
+	})
+
+	for i := 0; i < b.N; i++ {
+		m := []Model{}
+		if err := sqlxdb.Select(&m, "SELECT * FROM models"); err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
+	}
 }
