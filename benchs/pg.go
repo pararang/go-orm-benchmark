@@ -3,7 +3,7 @@ package benchs
 import (
 	"fmt"
 
-	"gopkg.in/pg.v4"
+	pg "github.com/go-pg/pg/v10"
 )
 
 var pgdb *pg.DB
@@ -18,9 +18,9 @@ func init() {
 		st.AddBenchmark("MultiRead limit 100", 2000*ORM_MULTI, PgReadSlice)
 
 		pgdb = pg.Connect(&pg.Options{
-			Addr:     "localhost",
-			User:     "postgres",
-			Password: "postgres",
+			Addr:     ":5432",
+			User:     "ando",
+			Password: "ando",
 			Database: "test",
 		})
 	}
@@ -34,8 +34,8 @@ func PgInsert(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
-		m.Id = 0
-		if err := pgdb.Create(&m); err != nil {
+		m.ID = 0
+		if err := pgdb.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -53,7 +53,7 @@ func PgInsertMulti(b *B) {
 		for i := 0; i < 100; i++ {
 			ms = append(ms, NewModel())
 		}
-		if err := pgdb.Create(&ms); err != nil {
+		if err := pgdb.Insert(&ms); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -65,14 +65,14 @@ func PgUpdate(b *B) {
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
-		if err := pgdb.Create(&m); err != nil {
+		if err := pgdb.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	})
 
 	for i := 0; i < b.N; i++ {
-		if err := pgdb.Update(&m); err != nil {
+		if err := pgdb.Update(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -84,14 +84,14 @@ func PgRead(b *B) {
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
-		if err := pgdb.Create(&m); err != nil {
+		if err := pgdb.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	})
 
 	for i := 0; i < b.N; i++ {
-		if err := pgdb.Select(&m); err != nil {
+		if err := pgdb.Select(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -104,8 +104,8 @@ func PgReadSlice(b *B) {
 		initDB()
 		m = NewModel()
 		for i := 0; i < 100; i++ {
-			m.Id = 0
-			if err := pgdb.Create(&m); err != nil {
+			m.ID = 0
+			if err := pgdb.Insert(m); err != nil {
 				fmt.Println(err)
 				b.FailNow()
 			}
