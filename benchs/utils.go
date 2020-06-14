@@ -7,14 +7,14 @@ import (
 )
 
 type Model struct {
-	Id      int `orm:"auto" gorm:"primary_key" db:"id"`
-	Name    string
-	Title   string
-	Fax     string
-	Web     string
-	Age     int
-	Right   bool
-	Counter int64
+	ID      int    `db:"id,omitempty" gorm:"primary_key" pg:",pk"`
+	Name    string `db:"name"`
+	Title   string `db:"title"`
+	Fax     string `db:"fax"`
+	Web     string `db:"web"`
+	Age     int    `db:"age"`
+	Right   bool   `db:"right"`
+	Counter int64  `db:"counter"`
 }
 
 func NewModel() *Model {

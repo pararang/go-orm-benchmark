@@ -56,7 +56,7 @@ func RawInsert(b *B) {
 }
 
 func rawInsert(m *Model) error {
-	// pq dose not support the LastInsertId method.
+	// pq does not support the LastInsertId method.
 	_, err := raw.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func RawUpdate(b *B) {
 	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter, m.Id)
+		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter, m.ID)
 		if err != nil {
 			fmt.Println(err)
 			b.FailNow()
@@ -162,8 +162,8 @@ func RawRead(b *B) {
 	for i := 0; i < b.N; i++ {
 		var mout Model
 		err := stmt.QueryRow(1).Scan(
-			//err := stmt.QueryRow(m.Id).Scan(
-			&mout.Id,
+			//err := stmt.QueryRow(m.ID).Scan(
+			&mout.ID,
 			&mout.Name,
 			&mout.Title,
 			&mout.Fax,
@@ -211,7 +211,7 @@ func RawReadSlice(b *B) {
 		}
 		for j = 0; rows.Next() && j < len(models); j++ {
 			err = rows.Scan(
-				&models[j].Id,
+				&models[j].ID,
 				&models[j].Name,
 				&models[j].Title,
 				&models[j].Fax,
