@@ -47,7 +47,7 @@ func GormInsert(b *B) {
 }
 
 func GormInsertMulti(b *B) {
-	panic(fmt.Errorf("Not support multi insert"))
+	panic(fmt.Errorf("No support for multi insert"))
 }
 
 func GormUpdate(b *B) {

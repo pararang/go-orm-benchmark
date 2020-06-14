@@ -48,7 +48,7 @@ func UpperInsert(b *B) {
 }
 
 func UpperInsertMulti(b *B) {
-	panic(fmt.Errorf("Not support multi insert"))
+	panic(fmt.Errorf("No support for multi insert"))
 }
 
 func UpperUpdate(b *B) {
