@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/milkpod29/orm-benchmark/benchs"
+	"github.com/dre1080/go-orm-benchmark/benchs"
 
 	_ "github.com/lib/pq"
 )
