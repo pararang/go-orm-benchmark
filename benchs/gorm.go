@@ -48,7 +48,22 @@ func GormInsert(b *B) {
 }
 
 func GormInsertMulti(b *B) {
-	panic(fmt.Errorf("No support for multi insert"))
+	var ms []*Model
+	wrapExecute(b, func() {
+		initDB()
+	})
+
+	for i := 0; i < b.N; i++ {
+		ms = make([]*Model, 0, 100)
+		for i := 0; i < 100; i++ {
+			ms = append(ms, NewModel())
+		}
+		d := gormdb.Create(&ms)
+		if d.Error != nil {
+			fmt.Println(d.Error)
+			b.FailNow()
+		}
+	}
 }
 
 func GormUpdate(b *B) {
