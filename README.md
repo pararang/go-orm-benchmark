@@ -51,71 +51,71 @@ From the left:
 - Number of memory allocations (memory allocation/allocation) performed in one execution (smaller is better)
 
 ```
-pg
-                   Insert:   2000    32.18s     16091028 ns/op    1042 B/op     12 allocs/op
-      MultiInsert 100 row:    500     9.81s     19621318 ns/op   14749 B/op    215 allocs/op
-                   Update:   2000    34.30s     17151712 ns/op     904 B/op     13 allocs/op
-                     Read:   4000     1.92s       478763 ns/op    1024 B/op     18 allocs/op
-      MultiRead limit 100:   2000     2.22s      1110607 ns/op   24761 B/op    624 allocs/op
-raw
-                   Insert:   2000    35.68s     17840277 ns/op     720 B/op     21 allocs/op
-      MultiInsert 100 row:    500     6.31s     12620714 ns/op  140488 B/op   1423 allocs/op
-                   Update:   2000     0.65s       324239 ns/op     728 B/op     21 allocs/op
-                     Read:   4000     1.18s       293964 ns/op     920 B/op     28 allocs/op
-      MultiRead limit 100:   2000     1.75s       876910 ns/op   28656 B/op   1212 allocs/op
-upper
-                   Insert:   2000    34.96s     17478780 ns/op   36452 B/op   1624 allocs/op
-      MultiInsert 100 row:    500     No support for multi insert
-                   Update:   2000    45.37s     22685399 ns/op   41480 B/op   1918 allocs/op
-                     Read:   4000     2.08s       520780 ns/op    7828 B/op    345 allocs/op
-      MultiRead limit 100:   2000     4.47s      2237225 ns/op   54981 B/op   1884 allocs/op
-gorm
-                   Insert:   2000    46.01s     23002695 ns/op    5807 B/op     93 allocs/op
-      MultiInsert 100 row:    500     No support for multi insert
-                   Update:   2000    37.55s     18775701 ns/op    6671 B/op     95 allocs/op
-                     Read:   4000     3.68s       919299 ns/op    4000 B/op     84 allocs/op
-      MultiRead limit 100:   2000     5.09s      2544694 ns/op   61104 B/op   3765 allocs/op
 sqlx
-                   Insert:   2000    41.16s     20581732 ns/op     896 B/op     22 allocs/op
-      MultiInsert 100 row:    500     7.56s     15126083 ns/op  140488 B/op   1423 allocs/op
-                   Update:   2000     1.33s       664444 ns/op     904 B/op     22 allocs/op
-                     Read:   4000     1.40s       351112 ns/op    1601 B/op     39 allocs/op
-      MultiRead limit 100:   2000     2.78s      1390878 ns/op   58640 B/op   1724 allocs/op
+                   Insert:   2000    38.48s     19241564 ns/op     720 B/op     21 allocs/op
+      MultiInsert 100 row:    500     6.64s     13279301 ns/op  140488 B/op   1423 allocs/op
+                   Update:   2000     0.66s       329501 ns/op     728 B/op     21 allocs/op
+                     Read:   4000     1.44s       359778 ns/op    1297 B/op     33 allocs/op
+      MultiRead limit 100:   2000     2.44s      1217624 ns/op   62376 B/op   1418 allocs/op
+raw
+                   Insert:   2000    55.04s     27521602 ns/op     720 B/op     21 allocs/op
+      MultiInsert 100 row:    500    11.33s     22650811 ns/op  140488 B/op   1423 allocs/op
+                   Update:   2000     0.66s       329317 ns/op     728 B/op     21 allocs/op
+                     Read:   4000     1.04s       260353 ns/op     920 B/op     28 allocs/op
+      MultiRead limit 100:   2000     2.02s      1009911 ns/op   28656 B/op   1212 allocs/op
+pg
+                   Insert:   2000    36.17s     18085514 ns/op    1042 B/op     12 allocs/op
+      MultiInsert 100 row:    500    14.56s     29127838 ns/op   14745 B/op    215 allocs/op
+                   Update:   2000    48.01s     24002962 ns/op     904 B/op     13 allocs/op
+                     Read:   4000     2.83s       706404 ns/op    1024 B/op     18 allocs/op
+      MultiRead limit 100:   2000     2.94s      1468444 ns/op   24762 B/op    624 allocs/op
+upper
+                   Insert:   2000    43.78s     21891197 ns/op   36454 B/op   1624 allocs/op
+      MultiInsert 100 row:    500     No support for multi insert
+                   Update:   2000    44.97s     22485917 ns/op   41480 B/op   1918 allocs/op
+                     Read:   4000     3.02s       754957 ns/op    7828 B/op    345 allocs/op
+      MultiRead limit 100:   2000     4.32s      2159214 ns/op   54981 B/op   1884 allocs/op
+gorm
+                   Insert:   2000    35.59s     17797016 ns/op    6096 B/op     96 allocs/op
+      MultiInsert 100 row:    500     7.61s     15212086 ns/op  194938 B/op   2696 allocs/op
+                   Update:   2000    40.21s     20102681 ns/op    6716 B/op     97 allocs/op
+                     Read:   4000     1.83s       457193 ns/op    3408 B/op     71 allocs/op
+      MultiRead limit 100:   2000     4.93s      2464402 ns/op   60520 B/op   3752 allocs/op
 
 Reports:
 
   2000 times - Insert
-        pg:    32.18s     16091028 ns/op    1042 B/op     12 allocs/op
-     upper:    34.96s     17478780 ns/op   36452 B/op   1624 allocs/op
-       raw:    35.68s     17840277 ns/op     720 B/op     21 allocs/op
-      sqlx:    41.16s     20581732 ns/op     896 B/op     22 allocs/op
-      gorm:    46.01s     23002695 ns/op    5807 B/op     93 allocs/op
+      gorm:    35.59s     17797016 ns/op    6096 B/op     96 allocs/op
+        pg:    36.17s     18085514 ns/op    1042 B/op     12 allocs/op
+      sqlx:    38.48s     19241564 ns/op     720 B/op     21 allocs/op
+     upper:    43.78s     21891197 ns/op   36454 B/op   1624 allocs/op
+       raw:    55.04s     27521602 ns/op     720 B/op     21 allocs/op
 
    500 times - MultiInsert 100 row
-       raw:     6.31s     12620714 ns/op  140488 B/op   1423 allocs/op
-      sqlx:     7.56s     15126083 ns/op  140488 B/op   1423 allocs/op
-        pg:     9.81s     19621318 ns/op   14749 B/op    215 allocs/op
+      sqlx:     6.64s     13279301 ns/op  140488 B/op   1423 allocs/op
+      gorm:     7.61s     15212086 ns/op  194938 B/op   2696 allocs/op
+       raw:    11.33s     22650811 ns/op  140488 B/op   1423 allocs/op
+        pg:    14.56s     29127838 ns/op   14745 B/op    215 allocs/op
      upper:     No support for multi insert
-      gorm:     No support for multi insert
 
   2000 times - Update
-       raw:     0.65s       324239 ns/op     728 B/op     21 allocs/op
-      sqlx:     1.33s       664444 ns/op     904 B/op     22 allocs/op
-        pg:    34.30s     17151712 ns/op     904 B/op     13 allocs/op
-      gorm:    37.55s     18775701 ns/op    6671 B/op     95 allocs/op
-     upper:    45.37s     22685399 ns/op   41480 B/op   1918 allocs/op
+       raw:     0.66s       329317 ns/op     728 B/op     21 allocs/op
+      sqlx:     0.66s       329501 ns/op     728 B/op     21 allocs/op
+      gorm:    40.21s     20102681 ns/op    6716 B/op     97 allocs/op
+     upper:    44.97s     22485917 ns/op   41480 B/op   1918 allocs/op
+        pg:    48.01s     24002962 ns/op     904 B/op     13 allocs/op
 
   4000 times - Read
-       raw:     1.18s       293964 ns/op     920 B/op     28 allocs/op
-      sqlx:     1.40s       351112 ns/op    1601 B/op     39 allocs/op
-        pg:     1.92s       478763 ns/op    1024 B/op     18 allocs/op
-     upper:     2.08s       520780 ns/op    7828 B/op    345 allocs/op
-      gorm:     3.68s       919299 ns/op    4000 B/op     84 allocs/op
+       raw:     1.04s       260353 ns/op     920 B/op     28 allocs/op
+      sqlx:     1.44s       359778 ns/op    1297 B/op     33 allocs/op
+      gorm:     1.83s       457193 ns/op    3408 B/op     71 allocs/op
+        pg:     2.83s       706404 ns/op    1024 B/op     18 allocs/op
+     upper:     3.02s       754957 ns/op    7828 B/op    345 allocs/op
 
   2000 times - MultiRead limit 100
-       raw:     1.75s       876910 ns/op   28656 B/op   1212 allocs/op
-        pg:     2.22s      1110607 ns/op   24761 B/op    624 allocs/op
-      sqlx:     2.78s      1390878 ns/op   58640 B/op   1724 allocs/op
-     upper:     4.47s      2237225 ns/op   54981 B/op   1884 allocs/op
-      gorm:     5.09s      2544694 ns/op   61104 B/op   3765 allocs/op
+       raw:     2.02s      1009911 ns/op   28656 B/op   1212 allocs/op
+      sqlx:     2.44s      1217624 ns/op   62376 B/op   1418 allocs/op
+        pg:     2.94s      1468444 ns/op   24762 B/op    624 allocs/op
+     upper:     4.32s      2159214 ns/op   54981 B/op   1884 allocs/op
+      gorm:     4.93s      2464402 ns/op   60520 B/op   3752 allocs/op
 ```
