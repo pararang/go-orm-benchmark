@@ -41,7 +41,7 @@ func SqlxInsert(b *B) {
 	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		_, err := sqlxdb.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		// pq does not support the LastInsertId method.
 		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 		if err != nil {
 			fmt.Println(err)

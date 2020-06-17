@@ -46,7 +46,7 @@ func RawInsert(b *B) {
 	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		// pq dose not support the LastInsertId method.
+		// pq does not support the LastInsertId method.
 		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 		if err != nil {
 			fmt.Println(err)
@@ -109,7 +109,7 @@ func RawInsertMulti(b *B) {
 			args[offset+5] = ms[j].Right
 			args[offset+6] = ms[j].Counter
 		}
-		// pq dose not support the LastInsertId method.
+		// pq does not support the LastInsertId method.
 		_, err := raw.Exec(query, args...)
 		if err != nil {
 			fmt.Println(err)
