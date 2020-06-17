@@ -20,7 +20,8 @@ func init() {
 		st.AddBenchmark("MultiRead limit 100", 2000*ORM_MULTI, GormReadSlice)
 
 		conn, err := gorm.Open(postgres.Open(ORM_SOURCE), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Error),
+			PrepareStmt: true,
+			Logger:      logger.Default.LogMode(logger.Error),
 		})
 		if err != nil {
 			fmt.Println(err)
