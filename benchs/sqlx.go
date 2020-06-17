@@ -27,13 +27,22 @@ func init() {
 
 func SqlxInsert(b *B) {
 	var m *Model
+	var stmt *sqlx.Stmt
 	wrapExecute(b, func() {
+		var err error
 		initDB()
 		m = NewModel()
+		stmt, err = sqlxdb.Preparex(rawInsertSQL)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
 	})
+	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
 		_, err := sqlxdb.Exec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 		if err != nil {
 			fmt.Println(err)
 			b.FailNow()
@@ -97,14 +106,22 @@ func SqlxInsertMulti(b *B) {
 
 func SqlxUpdate(b *B) {
 	var m *Model
+	var stmt *sqlx.Stmt
 	wrapExecute(b, func() {
+		var err error
 		initDB()
 		m = NewModel()
 		sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		stmt, err = sqlxdb.Preparex(rawUpdateSQL)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
 	})
+	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		_, err := sqlxdb.Exec(rawUpdateSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter, m.ID)
+		_, err := stmt.Exec(m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter, m.ID)
 		if err != nil {
 			fmt.Println(err)
 			b.FailNow()
@@ -114,15 +131,23 @@ func SqlxUpdate(b *B) {
 
 func SqlxRead(b *B) {
 	var m *Model
+	var stmt *sqlx.Stmt
 	wrapExecute(b, func() {
+		var err error
 		initDB()
 		m = NewModel()
 		sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
+		stmt, err = sqlxdb.Preparex(rawSelectSQL)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
 	})
+	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		m := Model{}
-		if err := sqlxdb.Get(&m, "SELECT * FROM models LIMIT 1"); err != nil {
+		var mout Model
+		if err := stmt.Get(&mout, 1); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -131,17 +156,25 @@ func SqlxRead(b *B) {
 
 func SqlxReadSlice(b *B) {
 	var m *Model
+	var stmt *sqlx.Stmt
 	wrapExecute(b, func() {
+		var err error
 		initDB()
 		m = NewModel()
 		for i := 0; i < 100; i++ {
 			sqlxdb.MustExec(rawInsertSQL, m.Name, m.Title, m.Fax, m.Web, m.Age, m.Right, m.Counter)
 		}
+		stmt, err = sqlxdb.Preparex(rawSelectMultiSQL)
+		if err != nil {
+			fmt.Println(err)
+			b.FailNow()
+		}
 	})
+	defer stmt.Close()
 
 	for i := 0; i < b.N; i++ {
-		m := []Model{}
-		if err := sqlxdb.Select(&m, "SELECT * FROM models"); err != nil {
+		models := make([]Model, 100)
+		if err := stmt.Select(&models); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
