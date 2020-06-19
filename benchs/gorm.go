@@ -99,7 +99,7 @@ func GormRead(b *B) {
 		}
 	})
 	for i := 0; i < b.N; i++ {
-		d := gormdb.Find(&m)
+		d := gormdb.First(&m, m.ID)
 		if d.Error != nil {
 			fmt.Println(d.Error)
 			b.FailNow()
