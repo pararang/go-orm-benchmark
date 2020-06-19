@@ -64,6 +64,7 @@ func UpperUpdate(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
+		m.Age = 20
 		err := sess.Collection("models").UpdateReturning(m)
 		if err != nil {
 			fmt.Println(err)

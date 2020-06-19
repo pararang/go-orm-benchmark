@@ -68,6 +68,7 @@ func PgUpdate(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
+		m.Age = 20
 		if err := pgdb.Update(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
