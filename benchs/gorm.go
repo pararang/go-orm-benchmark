@@ -79,7 +79,7 @@ func GormUpdate(b *B) {
 	})
 
 	for i := 0; i < b.N; i++ {
-		d := gormdb.Save(&m)
+		d := gormdb.Model(&m).Update("age", 20)
 		if d.Error != nil {
 			fmt.Println(d.Error)
 			b.FailNow()
@@ -124,7 +124,7 @@ func GormReadSlice(b *B) {
 
 	for i := 0; i < b.N; i++ {
 		var models []*Model
-		d := gormdb.Where("id > ?", 0).Limit(100).Find(&models)
+		d := gormdb.Limit(100).Find(&models)
 		if d.Error != nil {
 			fmt.Println(d.Error)
 			b.FailNow()
