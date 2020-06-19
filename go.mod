@@ -3,8 +3,8 @@ module github.com/dre1080/go-orm-benchmark
 go 1.14
 
 require (
+	github.com/facebookincubator/ent v0.2.5
 	github.com/go-pg/pg/v10 v10.0.0-beta.2
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kr/pretty v0.2.0 // indirect
