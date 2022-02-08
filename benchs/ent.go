@@ -10,7 +10,7 @@ import (
 var entdb *ent.Client
 
 func init() {
-	st := NewSuite("ent")
+	st := NewSuite("ent-orm")
 	st.InitF = func() {
 		st.AddBenchmark("Insert", 2000*ORM_MULTI, EntInsert)
 		st.AddBenchmark("MultiInsert 100 row", 500*ORM_MULTI, EntInsertMulti)
