@@ -6,23 +6,23 @@ import (
 	pg "github.com/go-pg/pg/v10"
 )
 
-var pgdb *pg.DB
+var pgdbORM *pg.DB
 
 func init() {
-	st := NewSuite("pg")
+	st := NewSuite("gopg-orm")
 	st.InitF = func() {
-		st.AddBenchmark("Insert", 2000*ORM_MULTI, PgInsert)
-		st.AddBenchmark("MultiInsert 100 row", 500*ORM_MULTI, PgInsertMulti)
-		st.AddBenchmark("Update", 2000*ORM_MULTI, PgUpdate)
-		st.AddBenchmark("Read", 4000*ORM_MULTI, PgRead)
-		st.AddBenchmark("MultiRead limit 100", 2000*ORM_MULTI, PgReadSlice)
+		st.AddBenchmark("Insert", 2000*ORM_MULTI, PgORMInsert)
+		st.AddBenchmark("MultiInsert 100 row", 500*ORM_MULTI, PgORMInsertMulti)
+		st.AddBenchmark("Update", 2000*ORM_MULTI, PgORMUpdate)
+		st.AddBenchmark("Read", 4000*ORM_MULTI, PgORMRead)
+		st.AddBenchmark("MultiRead limit 100", 2000*ORM_MULTI, PgORMReadSlice)
 
 		opts, _ := pg.ParseURL(ORM_SOURCE)
-		pgdb = pg.Connect(opts)
+		pgdbORM = pg.Connect(opts)
 	}
 }
 
-func PgInsert(b *B) {
+func PgORMInsert(b *B) {
 	var m *Model
 	wrapExecute(b, func() {
 		initDB()
@@ -31,17 +31,17 @@ func PgInsert(b *B) {
 
 	for i := 0; i < b.N; i++ {
 		m.ID = 0
-		if err := pgdb.Insert(m); err != nil {
+		if err := pgdbORM.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	}
 }
 
-func PgInsertMulti(b *B) {
+func PgORMInsertMulti(b *B) {
 	var ms []*Model
 	wrapExecute(b, func() {
-		initDB()
+		initDB()		
 	})
 
 	for i := 0; i < b.N; i++ {
@@ -49,19 +49,20 @@ func PgInsertMulti(b *B) {
 		for i := 0; i < 100; i++ {
 			ms = append(ms, NewModel())
 		}
-		if err := pgdb.Insert(&ms); err != nil {
+
+		if err := pgdbORM.Insert(&ms); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	}
 }
 
-func PgUpdate(b *B) {
+func PgORMUpdate(b *B) {
 	var m *Model
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
-		if err := pgdb.Insert(m); err != nil {
+		if err := pgdbORM.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
@@ -69,40 +70,40 @@ func PgUpdate(b *B) {
 
 	for i := 0; i < b.N; i++ {
 		m.Age = 20
-		if err := pgdb.Update(m); err != nil {
+		if err := pgdbORM.Update(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	}
 }
 
-func PgRead(b *B) {
+func PgORMRead(b *B) {
 	var m *Model
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
-		if err := pgdb.Insert(m); err != nil {
+		if err := pgdbORM.Insert(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	})
 
 	for i := 0; i < b.N; i++ {
-		if err := pgdb.Select(m); err != nil {
+		if err := pgdbORM.Select(m); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
 	}
 }
 
-func PgReadSlice(b *B) {
+func PgORMReadSlice(b *B) {
 	var m *Model
 	wrapExecute(b, func() {
 		initDB()
 		m = NewModel()
 		for i := 0; i < 100; i++ {
 			m.ID = 0
-			if err := pgdb.Insert(m); err != nil {
+			if err := pgdbORM.Insert(m); err != nil {
 				fmt.Println(err)
 				b.FailNow()
 			}
@@ -111,7 +112,7 @@ func PgReadSlice(b *B) {
 
 	for i := 0; i < b.N; i++ {
 		var models []*Model
-		if err := pgdb.Model(&models).Where("id > ?", 0).Limit(100).Select(); err != nil {
+		if err := pgdbORM.Model(&models).Where("id > ?", 0).Limit(100).Select(); err != nil {
 			fmt.Println(err)
 			b.FailNow()
 		}
