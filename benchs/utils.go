@@ -7,7 +7,7 @@ import (
 )
 
 type Model struct {
-	ID      int    `db:"id,omitempty" gorm:"primary_key" pg:",pk"`
+	ID      int    `db:"id,omitempty" gorm:"primary_key" pg:",pk" goqu:"skipinsert"`
 	Name    string `db:"name"`
 	Title   string `db:"title"`
 	Fax     string `db:"fax"`
@@ -19,15 +19,52 @@ type Model struct {
 
 func NewModel() *Model {
 	m := new(Model)
-	m.Name = "Orm Benchmark"
-	m.Title = "Just a Benchmark for fun"
+	m.Name = "ORM x SQL Builder x Native"
+	m.Title = "eMall BE Standard"
 	m.Fax = "99909990"
-	m.Web = "http://blog.milkpod29.me"
+	m.Web = "https://efishery.com"
 	m.Age = 100
 	m.Right = true
 	m.Counter = 1000
 
 	return m
+}
+
+type Farmer struct {
+	ID      int    `db:"id,omitempty" gorm:"primary_key" pg:",pk"`
+	Name    string `db:"name"`
+	Title   string `db:"title"`
+	Fax     string `db:"fax"`
+	Web     string `db:"web"`
+	Age     int    `db:"age"`
+	IsRight bool   `db:"is_right"`
+	Counter int64  `db:"counter"`
+}
+
+func NewFarmer() *Farmer {
+	m := new(Farmer)
+	m.Name = "Bench"
+	m.Title = "GoPostgres"
+	m.Fax = "99909990"
+	m.Web = "https://pararang.com"
+	m.Age = 100
+	m.IsRight = true
+	m.Counter = 1000
+
+	return m
+}
+
+func (m *Farmer) MapStringInterface() map[string]interface{} {
+	return map[string]interface{}{
+		// "id":       m.ID,
+		"name":     m.Name,
+		"title":    m.Title,
+		"fax":      m.Fax,
+		"web":      m.Web,
+		"age":      m.Age,
+		"is_right": m.IsRight,
+		"counter":  m.Counter,
+	}
 }
 
 var (
@@ -64,6 +101,19 @@ func initDB() {
 			"right" boolean NOT NULL,
 			counter bigint NOT NULL,
 			CONSTRAINT models_pkey PRIMARY KEY (id)
+			) WITH (OIDS=FALSE);`,
+
+		`DROP TABLE IF EXISTS farmers;`,
+		`CREATE TABLE farmers (
+			id SERIAL NOT NULL,
+			name text NOT NULL,
+			title text NOT NULL,
+			fax text NOT NULL,
+			web text NOT NULL,
+			age integer NOT NULL,
+			is_right boolean NOT NULL,
+			counter bigint NOT NULL,
+			CONSTRAINT farmers_pkey PRIMARY KEY (id)
 			) WITH (OIDS=FALSE);`,
 	}
 
