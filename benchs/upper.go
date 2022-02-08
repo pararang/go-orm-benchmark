@@ -11,7 +11,7 @@ import (
 var sess sqlbuilder.Database
 
 func init() {
-	st := NewSuite("upper")
+	st := NewSuite("upper-orm")
 	st.InitF = func() {
 		st.AddBenchmark("Insert", 2000*ORM_MULTI, UpperInsert)
 		st.AddBenchmark("MultiInsert 100 row", 500*ORM_MULTI, UpperInsertMulti)
