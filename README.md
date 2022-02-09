@@ -1,5 +1,8 @@
 # Go SQL Benchmark
-ORMs vs. SQl Builders vs. Raw
+## ORMs vs. SQl Builders vs. Raw
+Several ORMs also support query builder, therefore the benchmark for these ORMs is made separately between those using the ORM-way and the query builder-way. 
+
+To distinguish the benchmark of an ORM that uses the ORM-way or the builder-way, every initialization of the benchmark package name will be added the suffix -qb or -orm
 
 ### Environment
 
@@ -13,12 +16,13 @@ ORMs vs. SQl Builders vs. Raw
 
 All packages are the latest versions & run in no-cache mode.
 
-- [gorm](https://github.com/go-gorm/gorm)
-- [pg](https://github.com/go-pg/pg)
-- [upper/db](https://github.com/upper/db)
-- [sqlx](https://github.com/jmoiron/sqlx)
-- [raw](https://pkg.go.dev/database/sql)
-- [ent](https://github.com/facebookincubator/ent)
+- [gorm](https://github.com/go-gorm/gorm): orm
+- [pg](https://github.com/go-pg/pg): orm, query builder
+- [upper/db](https://github.com/upper/db): orm, query builder
+- [sqlx](https://github.com/jmoiron/sqlx): orm
+- [raw](https://pkg.go.dev/database/sql): raw/native go
+- [ent](https://github.com/facebookincubator/ent): orm
+- [goqu](https://github.com/doug-martin/goqu): query builder
 
 ### Run
 
@@ -51,8 +55,142 @@ From the left:
 - Memory size allocated for each execution (smaller is better)
 - Number of memory allocations (memory allocation/allocation) performed in one execution (smaller is better)
 
-```bash
-go run main.go -orm=all -multi=10
+```bash                 
+                          ./+o+-       prrng@this
+                  yyyyy- -yyyyyy+      OS: Ubuntu 20.04 focal
+               ://+//////-yyyyyyo      Kernel: x86_64 Linux 5.4.0-99-generic
+           .++ .:/++++++/-.+sss/`      Uptime: 21h 36m
+         .:++o:  /++++++++/:--:/-      Packages: 2183
+        o:+o+:++.`..```.-/oo+++++/     Shell: zsh 5.8
+       .:+o:+o/.          `+sssoo+/    Resolution: 2732x768
+  .++/+:+oo+o:`             /sssooo.   DE: GNOME 3.36.5
+ /+++//+:`oo+o               /::--:.   WM: Mutter
+ \+/+o+++`o++o               ++////.   WM Theme: Adwaita
+  .++.o+++oo+:`             /dddhhh.   GTK Theme: Yaru [GTK2/3]
+       .+.o+oo:.          `oddhhhh+    Icon Theme: Yaru
+        \+.++o+o``-````.:ohdhhhhh+     Font: Ubuntu 10
+         `:o+++ `ohhhhhhhhyo++os:      Disk: 66G / 124G (56%)
+           .o:`.syhhhhhhh/.oo++o`      CPU: Intel Core i5-7200U @ 4x 3.1GHz [74.0°C]
+               /osyyyyyyo++ooo+++/     GPU: NVIDIA GeForce 940MX
+                   ````` +oo+++o\:     RAM: 6836MiB / 7825MiB
+                          `oo++.      
+
+➜  go-sql-benchmark git:(benchmark-emall) ✗ go run main.go -orm=all         
+ent-orm
+                   Insert:   2000     1.72s       862167 ns/op    5148 B/op    126 allocs/op
+      MultiInsert 100 row:    500     No support for multi insert
+                   Update:   2000     2.30s      1149594 ns/op    5406 B/op    160 allocs/op
+                     Read:   4000     1.94s       484983 ns/op    5344 B/op    147 allocs/op
+      MultiRead limit 100:   2000     2.34s      1172208 ns/op   69345 B/op   2213 allocs/op
+gopg-orm
+                   Insert:   2000     0.90s       448271 ns/op    1075 B/op     12 allocs/op
+      MultiInsert 100 row:    500     1.45s      2899561 ns/op   14747 B/op    215 allocs/op
+                   Update:   2000     0.88s       438399 ns/op     904 B/op     13 allocs/op
+                     Read:   4000     0.88s       219767 ns/op    1040 B/op     18 allocs/op
+      MultiRead limit 100:   2000     0.92s       461323 ns/op   26397 B/op    624 allocs/op
+gopg-qb
+                   Insert:   2000     1.20s       601203 ns/op    1020 B/op     12 allocs/op
+      MultiInsert 100 row:    500     1.36s      2724094 ns/op   14747 B/op    215 allocs/op
+                   Update:   2000     0.82s       409445 ns/op     944 B/op     16 allocs/op
+                     Read:   4000     0.75s       188200 ns/op    1096 B/op     16 allocs/op
+      MultiRead limit 100:   2000     0.93s       462728 ns/op   26333 B/op    621 allocs/op
+sqlx
+                   Insert:   2000     0.68s       339856 ns/op     736 B/op     21 allocs/op
+      MultiInsert 100 row:    500     1.51s      3028304 ns/op  142089 B/op   1423 allocs/op
+                   Update:   2000     0.31s       157049 ns/op     744 B/op     21 allocs/op
+                     Read:   4000     0.63s       157674 ns/op    1313 B/op     33 allocs/op
+      MultiRead limit 100:   2000     0.92s       459749 ns/op   63977 B/op   1418 allocs/op
+gorm
+                   Insert:   2000     1.38s       691666 ns/op    6805 B/op    102 allocs/op
+      MultiInsert 100 row:    500     1.39s      2788219 ns/op  197340 B/op   2703 allocs/op
+                   Update:   2000     1.35s       677459 ns/op    5073 B/op     75 allocs/op
+                     Read:   4000     0.76s       190807 ns/op    4633 B/op     96 allocs/op
+      MultiRead limit 100:   2000     1.68s       842050 ns/op   61730 B/op   3740 allocs/op
+upper-orm
+                   Insert:   2000     5.51s      2754508 ns/op   36480 B/op   1624 allocs/op
+      MultiInsert 100 row:    500     No support for multi insert
+                   Update:   2000     4.79s      2392746 ns/op   41508 B/op   1917 allocs/op
+                     Read:   4000     0.91s       228207 ns/op    7844 B/op    345 allocs/op
+      MultiRead limit 100:   2000     1.62s       808080 ns/op   56581 B/op   1884 allocs/op
+raw
+                   Insert:   2000     0.67s       337201 ns/op     736 B/op     21 allocs/op
+      MultiInsert 100 row:    500     1.55s      3101677 ns/op  142089 B/op   1423 allocs/op
+                   Update:   2000     0.30s       148623 ns/op     744 B/op     21 allocs/op
+                     Read:   4000     0.59s       148663 ns/op     936 B/op     28 allocs/op
+      MultiRead limit 100:   2000     0.77s       383283 ns/op   30256 B/op   1212 allocs/op
+goqu-qb
+                   Insert:   2000     0.87s       437377 ns/op    5884 B/op    223 allocs/op
+      MultiInsert 100 row:    500     1.54s      3086399 ns/op  238404 B/op  11716 allocs/op
+                   Update:   2000     0.77s       386562 ns/op    1927 B/op     43 allocs/op
+                     Read:   4000     0.67s       168134 ns/op    2032 B/op     39 allocs/op
+      MultiRead limit 100:   2000     0.63s       317048 ns/op    2448 B/op     45 allocs/op
+upper-qb
+                   Insert:   2000     1.69s       845211 ns/op   11390 B/op    594 allocs/op
+      MultiInsert 100 row:    500     No support for multi insert
+                   Update:   2000     1.62s       810380 ns/op    6245 B/op    330 allocs/op
+                     Read:   4000     1.61s       402827 ns/op    7443 B/op    331 allocs/op
+      MultiRead limit 100:   2000     1.42s       712065 ns/op   55022 B/op   2068 allocs/op
+
+Reports: 
+
+  2000 times - Insert
+       raw:     0.67s       337201 ns/op     736 B/op     21 allocs/op
+      sqlx:     0.68s       339856 ns/op     736 B/op     21 allocs/op
+   goqu-qb:     0.87s       437377 ns/op    5884 B/op    223 allocs/op
+  gopg-orm:     0.90s       448271 ns/op    1075 B/op     12 allocs/op
+   gopg-qb:     1.20s       601203 ns/op    1020 B/op     12 allocs/op
+      gorm:     1.38s       691666 ns/op    6805 B/op    102 allocs/op
+  upper-qb:     1.69s       845211 ns/op   11390 B/op    594 allocs/op
+   ent-orm:     1.72s       862167 ns/op    5148 B/op    126 allocs/op
+ upper-orm:     5.51s      2754508 ns/op   36480 B/op   1624 allocs/op
+
+   500 times - MultiInsert 100 row
+   gopg-qb:     1.36s      2724094 ns/op   14747 B/op    215 allocs/op
+      gorm:     1.39s      2788219 ns/op  197340 B/op   2703 allocs/op
+  gopg-orm:     1.45s      2899561 ns/op   14747 B/op    215 allocs/op
+      sqlx:     1.51s      3028304 ns/op  142089 B/op   1423 allocs/op
+   goqu-qb:     1.54s      3086399 ns/op  238404 B/op  11716 allocs/op
+       raw:     1.55s      3101677 ns/op  142089 B/op   1423 allocs/op
+ upper-orm:     No support for multi insert
+   ent-orm:     No support for multi insert
+  upper-qb:     No support for multi insert
+
+  2000 times - Update
+       raw:     0.30s       148623 ns/op     744 B/op     21 allocs/op
+      sqlx:     0.31s       157049 ns/op     744 B/op     21 allocs/op
+   goqu-qb:     0.77s       386562 ns/op    1927 B/op     43 allocs/op
+   gopg-qb:     0.82s       409445 ns/op     944 B/op     16 allocs/op
+  gopg-orm:     0.88s       438399 ns/op     904 B/op     13 allocs/op
+      gorm:     1.35s       677459 ns/op    5073 B/op     75 allocs/op
+  upper-qb:     1.62s       810380 ns/op    6245 B/op    330 allocs/op
+   ent-orm:     2.30s      1149594 ns/op    5406 B/op    160 allocs/op
+ upper-orm:     4.79s      2392746 ns/op   41508 B/op   1917 allocs/op
+
+  4000 times - Read
+       raw:     0.59s       148663 ns/op     936 B/op     28 allocs/op
+      sqlx:     0.63s       157674 ns/op    1313 B/op     33 allocs/op
+   goqu-qb:     0.67s       168134 ns/op    2032 B/op     39 allocs/op
+   gopg-qb:     0.75s       188200 ns/op    1096 B/op     16 allocs/op
+      gorm:     0.76s       190807 ns/op    4633 B/op     96 allocs/op
+  gopg-orm:     0.88s       219767 ns/op    1040 B/op     18 allocs/op
+ upper-orm:     0.91s       228207 ns/op    7844 B/op    345 allocs/op
+  upper-qb:     1.61s       402827 ns/op    7443 B/op    331 allocs/op
+   ent-orm:     1.94s       484983 ns/op    5344 B/op    147 allocs/op
+
+  2000 times - MultiRead limit 100
+   goqu-qb:     0.63s       317048 ns/op    2448 B/op     45 allocs/op
+       raw:     0.77s       383283 ns/op   30256 B/op   1212 allocs/op
+      sqlx:     0.92s       459749 ns/op   63977 B/op   1418 allocs/op
+  gopg-orm:     0.92s       461323 ns/op   26397 B/op    624 allocs/op
+   gopg-qb:     0.93s       462728 ns/op   26333 B/op    621 allocs/op
+  upper-qb:     1.42s       712065 ns/op   55022 B/op   2068 allocs/op
+ upper-orm:     1.62s       808080 ns/op   56581 B/op   1884 allocs/op
+      gorm:     1.68s       842050 ns/op   61730 B/op   3740 allocs/op
+   ent-orm:     2.34s      1172208 ns/op   69345 B/op   2213 allocs/op
+
+#################################
+
+➜  go-sql-benchmark git:(benchmark-emall) ✗ go run main.go -orm=all -multi=10
 
 raw
                    Insert:  20000     8.09s       404345 ns/op     736 B/op     21 allocs/op
